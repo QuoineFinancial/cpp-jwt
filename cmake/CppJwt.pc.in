@@ -1,0 +1,6 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/include
+
+Name: @PROJECT_NAME@
+Description: Jwt Implementation for C++17 and above
+Version: @PROJECT_VERSION@

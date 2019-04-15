@@ -20,6 +20,18 @@
   </sub>
 </div>
 
+## Including in a hunter project
+
+```cmake
+hunter_add_package(Jwt)
+find_package(Jwt CONFIG REQUIRED)
+target_link_libraries(mytarget PUBLIC Jwt::jwt)
+```
+
+## Dependencies
+
+This project depends on `nlohmann_json` (see json in hunter-packages) and `OpenSSL` which are built automatically by Hunter
+
 ## Table of Contents
 - [What is it](#what-is-it)
 - [Example](#example)

@@ -831,12 +831,6 @@ namespace jwt
         {
         }
 
-        /// Default copy and assignment operator
-        jwt_signature(const jwt_signature &) = default;
-        jwt_signature &operator=(const jwt_signature &) = default;
-
-        ~jwt_signature() = default;
-
       public:   // Exposed APIs
         /**
          * Encodes the header and payload to get the

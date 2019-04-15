@@ -23,9 +23,9 @@
 ## Including in a hunter project
 
 ```cmake
-hunter_add_package(Jwt)
-find_package(Jwt CONFIG REQUIRED)
-target_link_libraries(mytarget PUBLIC Jwt::jwt)
+hunter_add_package(CppJwt)
+find_package(CppJwt CONFIG REQUIRED)
+target_link_libraries(mytarget PUBLIC CppJwt::jwt)
 ```
 
 ## Dependencies

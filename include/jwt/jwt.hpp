@@ -327,12 +327,6 @@ namespace jwt
          */
         jwt_header(const jwt::string_view enc_str) { this->decode(enc_str); }
 
-        /// Default Copy and assignment
-        jwt_header(const jwt_header &) = default;
-        jwt_header &operator=(const jwt_header &) = default;
-
-        ~jwt_header() = default;
-
       public:   // Exposed APIs
         /**
          * NOTE: Any previously saved json dump or the encoding of the

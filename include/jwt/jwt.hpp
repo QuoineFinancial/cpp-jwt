@@ -30,7 +30,7 @@ SOFTWARE.
 #include "jwt/config.hpp"
 #include "jwt/exceptions.hpp"
 #include "jwt/parameters.hpp"
-#include "jwt/string_view.hpp"
+#include <jwt/detail/string.hpp>
 
 #include <array>
 #include <cassert>
@@ -63,7 +63,7 @@ namespace jwt
      * `enum class type` into its actual type.
      */
     inline enum type
-    str_to_type(const jwt::string_view typ) noexcept
+    str_to_type(const std::string_view typ) noexcept
     {
         assert(typ.length() && "Empty type string");
 
@@ -80,7 +80,7 @@ namespace jwt
      * Converts an instance of type `enum class type`
      * to its string equivalent.
      */
-    inline jwt::string_view
+    inline std::string_view
     type_to_str(SCOPED_ENUM type typ)
     {
         switch (typ)
@@ -119,7 +119,7 @@ namespace jwt
      * Converts an instance of type `enum class registered_claims`
      * to its string equivalent representation.
      */
-    inline jwt::string_view
+    inline std::string_view
     reg_claims_to_str(SCOPED_ENUM registered_claims claim) noexcept
     {
         switch (claim)
@@ -167,21 +167,21 @@ namespace jwt
             }
 
             bool
-            operator()(const jwt::string_view lhs, const jwt::string_view rhs) const
+            operator()(const std::string_view lhs, const std::string_view rhs) const
             {
                 int ret = strcmp(lhs.data(), rhs.data());
                 return (ret < 0);
             }
 
             bool
-            operator()(const std::string &lhs, const jwt::string_view rhs) const
+            operator()(const std::string &lhs, const std::string_view rhs) const
             {
                 int ret = strcmp(lhs.data(), rhs.data());
                 return (ret < 0);
             }
 
             bool
-            operator()(const jwt::string_view lhs, const std::string &rhs) const
+            operator()(const std::string_view lhs, const std::string &rhs) const
             {
                 int ret = strcmp(lhs.data(), rhs.data());
                 return (ret < 0);
@@ -287,7 +287,7 @@ namespace jwt
          * Does URL safe base64 decoding.
          */
         std::string
-        base64_decode(const jwt::string_view encoded_str)
+        base64_decode(const std::string_view encoded_str)
         {
             return jwt::base64_uri_decode(encoded_str.data(), encoded_str.length());
         }
@@ -318,14 +318,14 @@ namespace jwt
         : alg_(alg)
         , typ_(typ)
         {
-            payload_["typ"] = type_to_str(typ_).to_string();
-            payload_["alg"] = alg_to_str(alg_).to_string();
+            payload_["typ"] = detail::to_string(type_to_str(typ_));
+            payload_["alg"] = detail::to_string(alg_to_str(alg_));
         }
 
         /**
          * Construct the header from an encoded string.
          */
-        jwt_header(const jwt::string_view enc_str) { this->decode(enc_str); }
+        jwt_header(const std::string_view enc_str) { this->decode(enc_str); }
 
       public:   // Exposed APIs
         /**
@@ -339,17 +339,17 @@ namespace jwt
         algo(SCOPED_ENUM algorithm alg)
         {
             alg_            = alg;
-            payload_["alg"] = alg_to_str(alg_).to_string();
+            payload_["alg"] = detail::to_string(alg_to_str(alg_));
         }
 
         /**
          * Set the algorithm. String overload.
          */
         void
-        algo(const jwt::string_view sv)
+        algo(const std::string_view sv)
         {
             alg_            = str_to_alg(sv.data());
-            payload_["alg"] = alg_to_str(alg_).to_string();
+            payload_["alg"] = detail::to_string(alg_to_str(alg_));
         }
 
         /**
@@ -372,17 +372,17 @@ namespace jwt
         typ(SCOPED_ENUM type typ) noexcept
         {
             typ_            = typ;
-            payload_["typ"] = type_to_str(typ_).to_string();
+            payload_["typ"] = detail::to_string(type_to_str(typ_));
         }
 
         /**
          * Set the JWT type header. String overload.
          */
         void
-        typ(const jwt::string_view sv)
+        typ(const std::string_view sv)
         {
             typ_            = str_to_type(sv.data());
-            payload_["typ"] = type_to_str(typ_).to_string();
+            payload_["typ"] = detail::to_string(type_to_str(typ_));
         }
 
         /**
@@ -398,9 +398,9 @@ namespace jwt
          * Add a header to the JWT header.
          */
         template < typename T,
-                   typename = std::enable_if_t< !std::is_same< jwt::string_view, std::decay_t< T > >::value > >
+                   typename = std::enable_if_t< !std::is_same< std::string_view, std::decay_t< T > >::value > >
         bool
-        add_header(const jwt::string_view hname, T &&hvalue, bool overwrite = false)
+        add_header(const std::string_view hname, T &&hvalue, bool overwrite = false)
         {
             auto itr = headers_.find(hname);
             if (itr != std::end(headers_) && !overwrite)
@@ -416,10 +416,10 @@ namespace jwt
 
         /**
          * Add a header to the JWT header.
-         * Overload which takes the header value as `jwt::string_view`
+         * Overload which takes the header value as `std::string_view`
          */
         bool
-        add_header(const jwt::string_view cname, const jwt::string_view cvalue, bool overwrite = false)
+        add_header(const std::string_view cname, const std::string_view cvalue, bool overwrite = false)
         {
             return add_header(cname, std::string { cvalue.data(), cvalue.length() }, overwrite);
         }
@@ -430,7 +430,7 @@ namespace jwt
          * from header. The typ_ is set to NONE when removed.
          */
         bool
-        remove_header(const jwt::string_view hname)
+        remove_header(const std::string_view hname)
         {
             if (!strcasecmp(hname.data(), "typ"))
             {
@@ -455,7 +455,7 @@ namespace jwt
          * is present or not.
          */
         bool
-        has_header(const jwt::string_view hname)
+        has_header(const std::string_view hname)
         {
             if (!strcasecmp(hname.data(), "typ"))
                 return typ_ != type::NONE;
@@ -485,7 +485,7 @@ namespace jwt
          * are not translated to an error_code. The API would
          * still throw an exception in those cases.
          */
-        void decode(const jwt::string_view enc_str, std::error_code &ec);
+        void decode(const std::string_view enc_str, std::error_code &ec);
 
         /**
          * Exception throwing API version of decode.
@@ -493,7 +493,7 @@ namespace jwt
          * Could also throw memory allocation failure
          * exceptions.
          */
-        void decode(const jwt::string_view enc_str);
+        void decode(const std::string_view enc_str);
 
         /**
          * Creates a `json_t` object this class instance.
@@ -539,7 +539,7 @@ namespace jwt
          * Construct the payload from an encoded string.
          * TODO: Throw an exception in case of error.
          */
-        jwt_payload(const jwt::string_view enc_str) { this->decode(enc_str); }
+        jwt_payload(const std::string_view enc_str) { this->decode(enc_str); }
 
 
       public:   // Exposed APIs
@@ -553,14 +553,14 @@ namespace jwt
          * @note: This overload works for all value types which
          * are:
          * a) _not_ an instance of type system_time_t.
-         * b) _not_ an instance of type jwt::string_view.
+         * b) _not_ an instance of type std::string_view.
          * c) can be written to `json_t` object.
          */
         template < typename T,
                    typename = typename std::enable_if_t< !std::is_same< system_time_t, std::decay_t< T > >::value ||
-                                                         !std::is_same< jwt::string_view, std::decay_t< T > >::value > >
+                                                         !std::is_same< std::string_view, std::decay_t< T > >::value > >
         bool
-        add_claim(const jwt::string_view cname, T &&cvalue, bool overwrite = false)
+        add_claim(const std::string_view cname, T &&cvalue, bool overwrite = false)
         {
             // Duplicate claim names not allowed
             // if overwrite flag is set to true.
@@ -584,7 +584,7 @@ namespace jwt
          * This overload takes string claim value.
          */
         bool
-        add_claim(const jwt::string_view cname, const jwt::string_view cvalue, bool overwrite = false)
+        add_claim(const std::string_view cname, const std::string_view cvalue, bool overwrite = false)
         {
             return add_claim(cname, std::string { cvalue.data(), cvalue.length() }, overwrite);
         }
@@ -595,7 +595,7 @@ namespace jwt
          * @note: Useful for providing timestamp as the claim value.
          */
         bool
-        add_claim(const jwt::string_view cname, system_time_t tp, bool overwrite = false)
+        add_claim(const std::string_view cname, system_time_t tp, bool overwrite = false)
         {
             return add_claim(
                 cname, std::chrono::duration_cast< std::chrono::seconds >(tp.time_since_epoch()).count(), overwrite);
@@ -607,7 +607,7 @@ namespace jwt
          */
         template < typename T,
                    typename = std::enable_if_t< !std::is_same< std::decay_t< T >, system_time_t >::value ||
-                                                !std::is_same< std::decay_t< T >, jwt::string_view >::value > >
+                                                !std::is_same< std::decay_t< T >, std::string_view >::value > >
         bool
         add_claim(SCOPED_ENUM registered_claims cname, T &&cvalue, bool overwrite = false)
         {
@@ -630,10 +630,10 @@ namespace jwt
         /**
          * Adds a claim.
          * This overload takes `registered_claims` as the claim name and
-         * `jwt::string_view` as the claim value type.
+         * `std::string_view` as the claim value type.
          */
         bool
-        add_claim(SCOPED_ENUM registered_claims cname, jwt::string_view cvalue, bool overwrite = false)
+        add_claim(SCOPED_ENUM registered_claims cname, std::string_view cvalue, bool overwrite = false)
         {
             return add_claim(reg_claims_to_str(cname), std::string { cvalue.data(), cvalue.length() }, overwrite);
         }
@@ -648,7 +648,7 @@ namespace jwt
          */
         template < typename T >
         decltype(auto)
-        get_claim_value(const jwt::string_view cname) const
+        get_claim_value(const std::string_view cname) const
         {
             return payload_[cname.data()].get< T >();
         }
@@ -673,7 +673,7 @@ namespace jwt
          * Remove a claim identified by a claim name.
          */
         bool
-        remove_claim(const jwt::string_view cname)
+        remove_claim(const std::string_view cname)
         {
             auto itr = claim_names_.find(cname);
             if (itr == claim_names_.end())
@@ -705,7 +705,7 @@ namespace jwt
         // because count() is not made const for is_transparent
         // based overload
         bool
-        has_claim(const jwt::string_view cname) const noexcept
+        has_claim(const std::string_view cname) const noexcept
         {
             return claim_names_.find(cname) != std::end(claim_names_);
         }
@@ -728,7 +728,7 @@ namespace jwt
          */
         template < typename T >
         bool
-        has_claim_with_value(const jwt::string_view cname, T &&cvalue) const
+        has_claim_with_value(const std::string_view cname, T &&cvalue) const
         {
             auto itr = claim_names_.find(cname);
             if (itr == claim_names_.end())
@@ -769,7 +769,7 @@ namespace jwt
          * @note: Allocation failures are still thrown out
          * as exceptions.
          */
-        void decode(const jwt::string_view enc_str, std::error_code &ec);
+        void decode(const std::string_view enc_str, std::error_code &ec);
 
         /**
          * Overload of decode API which throws exception
@@ -777,7 +777,7 @@ namespace jwt
          *
          * Throws DecodeError on failure.
          */
-        void decode(const jwt::string_view enc_str);
+        void decode(const std::string_view enc_str);
 
         /**
          * Creates a JSON object of the payload.
@@ -815,7 +815,7 @@ namespace jwt
         /**
          * Constructor which takes the key.
          */
-        jwt_signature(const jwt::string_view key)
+        jwt_signature(const std::string_view key)
         : key_(key.data(), key.length())
         {
         }
@@ -833,7 +833,7 @@ namespace jwt
          * of bool and error_code.
          */
         verify_result_t
-        verify(const jwt_header &header, const jwt::string_view hdr_pld_sign, const jwt::string_view jwt_sign);
+        verify(const jwt_header &header, const std::string_view hdr_pld_sign, const std::string_view jwt_sign);
 
       private:   // Private implementation
         /*!
@@ -898,7 +898,7 @@ namespace jwt
          * @note: Instead of actually splitting the API
          * simply provides an array of view.
          */
-        static std::array< jwt::string_view, 3 > three_parts(const jwt::string_view enc_str);
+        static std::array< std::string_view, 3 > three_parts(const std::string_view enc_str);
 
       public:   // Exposed APIs
         /**
@@ -988,7 +988,7 @@ namespace jwt
          * Set the secret to be used for signing.
          */
         void
-        secret(const jwt::string_view sv)
+        secret(const std::string_view sv)
         {
             secret_.assign(sv.data(), sv.length());
         }
@@ -1000,7 +1000,7 @@ namespace jwt
         template < typename T,
                    typename = typename std::enable_if_t< !std::is_same< system_time_t, std::decay_t< T > >::value > >
         jwt_object &
-        add_claim(const jwt::string_view name, T &&value)
+        add_claim(const std::string_view name, T &&value)
         {
             payload_.add_claim(name, std::forward< T >(value));
             return *this;
@@ -1014,7 +1014,7 @@ namespace jwt
          * Specialization for time points.
          * Eg: Users can set `exp` claim to `chrono::system_clock::now()`.
          */
-        jwt_object &add_claim(const jwt::string_view name, system_time_t time_point);
+        jwt_object &add_claim(const std::string_view name, system_time_t time_point);
 
         /**
          * Provides the glue interface for adding claim.
@@ -1034,7 +1034,7 @@ namespace jwt
          *
          * @note: See `jwt_payload::remove_claim` for more details.
          */
-        jwt_object &remove_claim(const jwt::string_view name);
+        jwt_object &remove_claim(const std::string_view name);
 
         /**
          * Provides the glue interface for removing claim.
@@ -1054,7 +1054,7 @@ namespace jwt
          * @note: See `jwt_payload::has_claim` for more details.
          */
         bool
-        has_claim(const jwt::string_view cname) const noexcept
+        has_claim(const std::string_view cname) const noexcept
         {
             return payload().has_claim(cname);
         }
@@ -1205,7 +1205,7 @@ namespace jwt
      * 8. validate_jti: Checks if jti claim is present or not.
      */
     template < typename SequenceT, typename... Args >
-    jwt_object decode(const jwt::string_view                               enc_str,
+    jwt_object decode(const std::string_view                               enc_str,
                       const params::detail::algorithms_param< SequenceT > &algos,
                       std::error_code &                                    ec,
                       Args &&... args);
@@ -1216,7 +1216,7 @@ namespace jwt
      */
     template < typename SequenceT, typename... Args >
     jwt_object
-    decode(const jwt::string_view enc_str, const params::detail::algorithms_param< SequenceT > &algos, Args &&... args);
+    decode(const std::string_view enc_str, const params::detail::algorithms_param< SequenceT > &algos, Args &&... args);
 
 }   // END namespace jwt
 

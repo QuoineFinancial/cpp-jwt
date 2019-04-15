@@ -45,7 +45,7 @@ SOFTWARE.
 
 #include "jwt/assertions.hpp"
 #include "jwt/exceptions.hpp"
-#include "jwt/string_view.hpp"
+#include <string_view>
 #include "jwt/error_codes.hpp"
 #include "jwt/base64.hpp"
 #include "jwt/config.hpp"
@@ -57,12 +57,12 @@ using sign_result_t = std::pair<std::string, std::error_code>;
 /// The result type of verification function
 using verify_result_t = std::pair<bool, std::error_code>;
 /// The function pointer type for the signing function
-using sign_func_t   = sign_result_t (*) (const jwt::string_view key, 
-                                         const jwt::string_view data);
+using sign_func_t   = sign_result_t (*) (const std::string_view key,
+                                         const std::string_view data);
 /// The function pointer type for the verifying function
-using verify_func_t = verify_result_t (*) (const jwt::string_view key,
-                                           const jwt::string_view head,
-                                           const jwt::string_view jwt_sign);
+using verify_func_t = verify_result_t (*) (const std::string_view key,
+                                           const std::string_view head,
+                                           const std::string_view jwt_sign);
 
 namespace algo {
 
@@ -222,7 +222,7 @@ enum class algorithm
  * Convert the algorithm enum class type to
  * its stringified form.
  */
-inline jwt::string_view alg_to_str(SCOPED_ENUM algorithm alg) noexcept
+inline std::string_view alg_to_str(SCOPED_ENUM algorithm alg) noexcept
 {
   switch (alg) {
     case algorithm::HS256: return "HS256";
@@ -247,7 +247,7 @@ inline jwt::string_view alg_to_str(SCOPED_ENUM algorithm alg) noexcept
  * Convert stringified algorithm to enum class.
  * The string comparison is case insesitive.
  */
-inline SCOPED_ENUM algorithm str_to_alg(const jwt::string_view alg) noexcept
+inline SCOPED_ENUM algorithm str_to_alg(const std::string_view alg) noexcept
 {
   if (!alg.length()) return algorithm::NONE;
 
@@ -348,7 +348,7 @@ struct HMACSign
    *    Any allocation failure will result in jwt::MemoryAllocationException
    *    being thrown.
    */
-  static sign_result_t sign(const jwt::string_view key, const jwt::string_view data)
+  static sign_result_t sign(const std::string_view key, const std::string_view data)
   {
     std::string sign;
     sign.resize(EVP_MAX_MD_SIZE);
@@ -393,7 +393,7 @@ struct HMACSign
    *    being thrown.
    */
   static verify_result_t 
-  verify(const jwt::string_view key, const jwt::string_view head, const jwt::string_view sign);
+  verify(const std::string_view key, const std::string_view head, const std::string_view sign);
 
 };
 
@@ -421,7 +421,7 @@ struct HMACSign<algo::NONE>
   /**
    * Basically a no-op. Sets the error code to NoneAlgorithmUsed.
    */
-  static sign_result_t sign(const jwt::string_view key, const jwt::string_view data)
+  static sign_result_t sign(const std::string_view key, const std::string_view data)
   {
     (void)key;
     (void)data;
@@ -435,7 +435,7 @@ struct HMACSign<algo::NONE>
    * Basically a no-op. Sets the error code to NoneAlgorithmUsed.
    */
   static verify_result_t
-  verify(const jwt::string_view key, const jwt::string_view head, const jwt::string_view sign)
+  verify(const std::string_view key, const std::string_view head, const std::string_view sign)
   {
     (void)key;
     (void)head;
@@ -478,7 +478,7 @@ public:
    *  Any allocation failure would be thrown out as
    *  jwt::MemoryAllocationException.
    */
-  static sign_result_t sign(const jwt::string_view key, const jwt::string_view data)
+  static sign_result_t sign(const std::string_view key, const std::string_view data)
   {
     std::error_code ec{};
 
@@ -502,21 +502,21 @@ public:
   /**
    */
   static verify_result_t
-  verify(const jwt::string_view key, const jwt::string_view head, const jwt::string_view sign);
+  verify(const std::string_view key, const std::string_view head, const std::string_view sign);
 
 private:
 
   /*!
    */
-  static EVP_PKEY* load_key(const jwt::string_view key, std::error_code& ec);
+  static EVP_PKEY* load_key(const std::string_view key, std::error_code& ec);
 
   /*!
    */
-  static std::string evp_digest(EVP_PKEY* pkey, const jwt::string_view data, std::error_code& ec);
+  static std::string evp_digest(EVP_PKEY* pkey, const std::string_view data, std::error_code& ec);
 
   /*!
    */
-  static std::string public_key_ser(EVP_PKEY* pkey, jwt::string_view sign, std::error_code& ec);
+  static std::string public_key_ser(EVP_PKEY* pkey, std::string_view sign, std::error_code& ec);
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 

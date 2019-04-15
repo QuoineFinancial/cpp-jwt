@@ -32,7 +32,7 @@ SOFTWARE.
 
 #include "jwt/algorithm.hpp"
 #include "jwt/detail/meta.hpp"
-#include "jwt/string_view.hpp"
+#include <string_view>
 
 namespace jwt {
 
@@ -76,12 +76,12 @@ struct payload_param
  */
 struct secret_param
 {
-  secret_param(string_view sv)
+  secret_param(std::string_view sv)
     : secret_(sv)
   {}
 
-  string_view get() { return secret_; }
-  string_view secret_;
+  std::string_view get() { return secret_; }
+  std::string_view secret_;
 };
 
 template <typename T>
@@ -102,7 +102,7 @@ struct secret_function_param
  */
 struct algorithm_param
 {
-  algorithm_param(const string_view alg)
+  algorithm_param(std::string_view alg)
     : alg_(str_to_alg(alg))
   {}
 
@@ -268,8 +268,8 @@ struct nbf_param
 } // END namespace detail
 
 // Useful typedef
-using param_init_list_t = std::initializer_list<std::pair<jwt::string_view, jwt::string_view>>;
-using param_seq_list_t  = std::initializer_list<jwt::string_view>;
+using param_init_list_t = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+using param_seq_list_t  = std::initializer_list<std::string_view>;
 
 
 /**
@@ -301,13 +301,13 @@ payload(MappingConcept&& mc)
 
 /**
  */
-inline detail::secret_param secret(const string_view sv)
+inline detail::secret_param secret(const std::string_view sv)
 {
-  return { sv };
+  return detail::secret_param(sv);
 }
 
 template <typename T>
-inline std::enable_if_t<!std::is_convertible<T, string_view>::value, detail::secret_function_param<T>>  
+inline std::enable_if_t<!std::is_convertible<T, std::string_view>::value, detail::secret_function_param<T>>
 secret(T&& fun)
 {
   return detail::secret_function_param<T>{ fun };
@@ -315,7 +315,7 @@ secret(T&& fun)
 
 /**
  */
-inline detail::algorithm_param algorithm(const string_view sv)
+inline detail::algorithm_param algorithm(std::string_view sv)
 {
   return { sv };
 }
@@ -392,7 +392,7 @@ algorithms(SequenceConcept&& sc)
 /**
  */
 inline detail::audience_param
-aud(const jwt::string_view aud)
+aud(const std::string_view aud)
 {
   return { aud.data() };
 }
@@ -400,7 +400,7 @@ aud(const jwt::string_view aud)
 /**
  */
 inline detail::issuer_param
-issuer(const jwt::string_view iss)
+issuer(const std::string_view iss)
 {
   return { iss.data() };
 }
@@ -408,7 +408,7 @@ issuer(const jwt::string_view iss)
 /**
  */
 inline detail::subject_param
-sub(const jwt::string_view subj)
+sub(const std::string_view subj)
 {
   return { subj.data() };
 }

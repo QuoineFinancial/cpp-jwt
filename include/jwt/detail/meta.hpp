@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <iterator>
 #include <type_traits>
-#include "jwt/string_view.hpp"
+#include <string_view>
 
 namespace jwt {
 namespace detail {
@@ -78,9 +78,9 @@ struct has_create_json_obj_member<T,
  * Checks if the type `T` models MappingConcept.
  *
  * Requirements on type `T` for matching the requirements:
- *  a. Must be able to construct jwt::string_view from the
+ *  a. Must be able to construct std::string_view from the
  *     `key_type` of the map.
- *  b. Must be able to construct jwt::string_view from the
+ *  b. Must be able to construct std::string_view from the
  *    `mapped_type` of the map.
  *  c. The type `T` must have an access operator i.e. operator[].
  *  d. The type `T` must have `begin` and `end` member functions
@@ -99,12 +99,12 @@ template <typename T>
 struct is_mapping_concept<T,
   void_t<
     typename std::enable_if<
-      std::is_constructible<jwt::string_view, typename std::remove_reference_t<T>::key_type>::value,
+      std::is_constructible<std::string_view, typename std::remove_reference_t<T>::key_type>::value,
       void
     >::type,
 
     typename std::enable_if<
-      std::is_constructible<jwt::string_view, typename std::remove_reference_t<T>::mapped_type>::value,
+      std::is_constructible<std::string_view, typename std::remove_reference_t<T>::mapped_type>::value,
       void
     >::type,
 
@@ -158,7 +158,7 @@ struct is_sequence_concept<T,
     std::enable_if_t<std::is_array<std::decay_t<T>>::value>,
 
     std::enable_if_t<
-      std::is_constructible<jwt::string_view, 
+      std::is_constructible<std::string_view,
                             std::remove_reference_t<decltype(*std::begin(std::declval<T&>()))>>::value
     >
   >
@@ -176,7 +176,7 @@ struct is_sequence_concept<T,
       >::value>,
 
       std::enable_if_t<
-        std::is_constructible<jwt::string_view, typename std::remove_reference_t<T>::value_type>::value
+        std::is_constructible<std::string_view, typename std::remove_reference_t<T>::value_type>::value
       >,
 
     decltype(

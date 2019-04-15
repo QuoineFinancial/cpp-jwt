@@ -178,9 +178,9 @@ TEST (EncodeTest, StrEncodeHS512WithKey)
     "eyJhdWQiOiJyaWZ0LmlvIiwiZXhwIjoxNTEzODYzMzcxLCJzdWIiOiJub3RoaW5nIG11Y2gifQ."
     "vQ-1JSFN1kPjUI3URP6AFK5z8V7xLhyhw-76QWhQg9Xcy-IgrJ-bCTYLBjgaprrcEWwpSnBQnP3QnIxYK0HEaQ";
 
-  jwt::string_view key = "00112233445566778899";
+  std::string_view key = "00112233445566778899";
 
-  std::map<jwt::string_view, jwt::string_view> p;
+  std::map<std::string_view, std::string_view> p;
   p["aud"] = "rift.io";
   p["sub"] = "nothing much";
 
@@ -202,9 +202,9 @@ TEST (EncodeTest, StrEncodeChangeAlg)
   const char* expected_none_sign = 
     "eyJhbGciOiJOT05FIiwidHlwIjoiSldUIn0.eyJhdWQiOiJyaWZ0LmlvIiwiZXhwIjoxNTEzODYzMzcxLCJzdWIiOiJub3RoaW5nIG11Y2gifQ.";
 
-  jwt::string_view key = "00112233445566778899";
+  std::string_view key = "00112233445566778899";
 
-  std::map<std::string, jwt::string_view> p;
+  std::map<std::string, std::string_view> p;
   p["aud"] = "rift.io";
   p["sub"] = "nothing much";
 
@@ -239,8 +239,8 @@ TEST (EncodeTest, StrEncodeNoneAlgWithKey)
 {
   using namespace jwt::params;
 
-  const jwt::string_view secret1 = "abcdefghijklmnopqrstuvwxyz";
-  const jwt::string_view secret2 = "0123456789qwertybabe";
+  const std::string_view secret1 = "abcdefghijklmnopqrstuvwxyz";
+  const std::string_view secret2 = "0123456789qwertybabe";
 
   jwt::jwt_object obj{algorithm("NONE"),
                       payload({{"iss", "arn-ml"}}),

@@ -1,7 +1,7 @@
 <h1 align="center">CPP-JWT</h1>
 
 <div align="center">
-  <strong>A C++14 library for JSON Web Tokens(JWT)</strong>
+  <strong>A C++17 library for JSON Web Tokens(JWT)</strong>
 </div>
 
 <br/>
@@ -16,6 +16,7 @@
   <sub>
     A little library built with lots of ❤︎  for working with JWT easier.
     By Arun Muralidharan.
+    Modified by Richard Hodges for Quoine Corp
   </sub>
 </div>
 
@@ -268,13 +269,13 @@ All the parameters are basically a function which returns an instance of a type 
   - <strong>secret</strong>
 
     Used to pass the key which could be some random string or public certificate data as string.
-    The passed string type must be convertible to <code>jwt::string_view</code>
+    The passed string type must be convertible to <code>std::string_view</code>
 
   - <strong>algorithm</strong>
 
     Used to pass the type of algorithm to use for encoding.
     There are two overloads of this function:
-    - Takes <code>jwt::string_view</code>
+    - Takes <code>std::string_view</code>
 
       Can pass the algorithm value in any case. It is case agnostic.
 

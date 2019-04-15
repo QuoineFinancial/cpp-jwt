@@ -140,7 +140,7 @@ TEST (DecodeTest, DecodeHS384)
     "eyJhdWQiOiJyaWZ0LmlvIiwiZXhwIjoxNTEzODYzMzcxLCJzdWIiOiJub3RoaW5nIG11Y2gifQ."
     "cGN4FZCe9Y2c1dA-jP71IXGnYbJRc4OaUTa5m7N7ybF5h6wBwxWQ-pdcxYchjDBL";
 
-  const jwt::string_view key = "0123456789abcdefghijklmnopqrstuvwxyz";
+  const std::string_view key = "0123456789abcdefghijklmnopqrstuvwxyz";
 
   std::error_code ec;
   auto obj = jwt::decode(enc_str, algorithms({"none", "hs384"}), ec, verify(false), secret(key));
@@ -159,7 +159,7 @@ TEST (DecodeTest, DecodeHS512)
   "eyJhdWQiOiJyaWZ0LmlvIiwiZXhwIjoxNTEzODYzMzcxLCJzdWIiOiJub3RoaW5nIG11Y2gifQ."
   "vQ-1JSFN1kPjUI3URP6AFK5z8V7xLhyhw-76QWhQg9Xcy-IgrJ-bCTYLBjgaprrcEWwpSnBQnP3QnIxYK0HEaQ";
 
-  const jwt::string_view key = "00112233445566778899";
+  const std::string_view key = "00112233445566778899";
 
   std::error_code ec;
   auto obj = jwt::decode(enc_str, algorithms({"none", "hs384", "hs512"}), ec, verify(false), secret(key));

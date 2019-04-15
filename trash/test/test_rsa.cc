@@ -33,8 +33,8 @@ tEOtzsP5GMDYVlEp1jYSjzQ=
 
 void basic_rsa_test()
 {
-  jwt::string_view sv = rsa_2048_pem;
-  jwt::string_view d = "Some random data string";
+  std::string_view sv = rsa_2048_pem;
+  std::string_view d = "Some random data string";
 
   auto res = jwt::PEMSign<jwt::algo::RS256>::sign(sv, d);
  

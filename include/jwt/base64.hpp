@@ -28,7 +28,7 @@ SOFTWARE.
 #include <cstring>
 #include <ostream>
 #include "jwt/config.hpp"
-#include "jwt/string_view.hpp"
+#include <string_view>
 
 namespace jwt {
 

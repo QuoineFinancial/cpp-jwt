@@ -26,7 +26,7 @@ void basic_jwt_object_test()
   std::cout << obj2.payload() << std::endl;
 
   //check with unordered map of string_view
-  std::unordered_map<jwt::string_view, std::string> um = {
+  std::unordered_map<std::string_view, std::string> um = {
     {"a", "b"},
     {"c", "d"}
   };

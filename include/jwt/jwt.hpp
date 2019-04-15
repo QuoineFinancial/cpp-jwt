@@ -541,11 +541,6 @@ namespace jwt
          */
         jwt_payload(const jwt::string_view enc_str) { this->decode(enc_str); }
 
-        /// Default copy and assignment operations
-        jwt_payload(const jwt_payload &) = default;
-        jwt_payload &operator=(const jwt_payload &) = default;
-
-        ~jwt_payload() = default;
 
       public:   // Exposed APIs
         /**

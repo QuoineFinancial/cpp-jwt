@@ -5,32 +5,11 @@
 
 #include "gtest/gtest.h"
 #include "jwt/jwt.hpp"
+#include "read_from_file.hpp"
 
 #define EC384_PUB_KEY CERT_ROOT_DIR "/ec_certs/ec384_pub.pem"
 #define EC384_PRIV_KEY CERT_ROOT_DIR "/ec_certs/ec384_priv.pem"
 
-std::string read_from_file(const std::string& path)
-{
-  std::string contents;
-  std::ifstream is{path, std::ifstream::binary};
-
-  if (is) {
-    // get length of file:
-    is.seekg (0, is.end);
-    auto length = is.tellg();
-    is.seekg (0, is.beg);
-    contents.resize(length);
-
-    is.read(&contents[0], length);
-    if (!is) {
-      is.close();
-      return {};
-    }
-  }
-
-  is.close();
-  return contents;
-}
 
 TEST (ESAlgo, ES256EncodingDecodingTest)
 {
@@ -147,7 +126,3 @@ TEST (ESAlgo, ES384EncodingDecodingValidTest)
   EXPECT_EQ (dec_obj2.header().algo(), jwt::algorithm::ES384);
 }
 
-int main(int argc, char* argv[]) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

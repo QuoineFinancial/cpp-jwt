@@ -193,8 +193,3 @@ TEST (DecodeVerify, InvalidSignatureTest)
   dec_obj = jwt::decode("abcdsdfhbsdhjfbsdj.", algorithms({"hs256"}), ec, secret("secret"), validate_iat(true));
   EXPECT_EQ (ec.value(), static_cast<int>(jwt::DecodeErrc::SignatureFormatError));
 }
-
-int main(int argc, char* argv[]) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

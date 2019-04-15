@@ -6,35 +6,13 @@
 #include "gtest/gtest.h"
 #include "jwt/jwt.hpp"
 
+#include "read_from_file.hpp"
 #define RSA256_PUB_KEY CERT_ROOT_DIR "/rsa_certs/rsa256_pub.pem"
 #define RSA256_PRIV_KEY CERT_ROOT_DIR "/rsa_certs/rsa256_priv.pem"
 #define RSA384_PUB_KEY CERT_ROOT_DIR "/rsa_certs/rsa384_pub.pem"
 #define RSA384_PRIV_KEY CERT_ROOT_DIR "/rsa_certs/rsa384_priv.pem"
 #define RSA512_PUB_KEY CERT_ROOT_DIR "/rsa_certs/rsa512_pub.pem"
 #define RSA512_PRIV_KEY CERT_ROOT_DIR "/rsa_certs/rsa512_priv.pem"
-
-std::string read_from_file(const std::string& path)
-{
-  std::string contents;
-  std::ifstream is{path, std::ifstream::binary};
-
-  if (is) {
-    // get length of file:
-    is.seekg (0, is.end);
-    auto length = is.tellg();
-    is.seekg (0, is.beg);
-    contents.resize(length);
-
-    is.read(&contents[0], length);
-    if (!is) {
-      is.close();
-      return {};
-    }
-  }
-
-  is.close();
-  return contents;
-}
 
 TEST (RSAAlgo, RSA256EncodingDecodingTest)
 {
@@ -143,7 +121,3 @@ TEST (RSAAlgo, NoSpecificAlgo)
                 jwt::InvalidAlgorithmError);
 }
 
-int main(int argc, char* argv[]) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

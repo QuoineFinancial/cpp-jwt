@@ -15,7 +15,9 @@ HunterGate(
         LOCAL
 )
 
-project (CppJwt)
+project (CppJwt VERSION 1.0.0 LANGUAGES CXX)
+
+include(GNUInstallDirs)
 
 option(BUILD_TESTS "build the tests")
 option(BUILD_EXAMPLES "build the examples")
@@ -30,10 +32,14 @@ find_package(OpenSSL REQUIRED)
 add_library(jwt INTERFACE)
 file(GLOB_RECURSE interface_hpp RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "include/*.hpp")
 file(GLOB_RECURSE interface_ipp RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "include/*.ipp")
-target_sources(jwt INTERFACE ${interface_hpp} ${interface_ipp})
+target_sources(jwt INTERFACE $<BUILD_INTERFACE:${interface_hpp} ${interface_ipp}>)
 
-target_include_directories(jwt INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_include_directories(jwt INTERFACE $<INSTALL_INTERFACE:include>)
+target_include_directories(
+        jwt
+        INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
 target_link_libraries(jwt INTERFACE OpenSSL::SSL OpenSSL::Crypto nlohmann_json::nlohmann_json)
 
 add_library(CppJwt::jwt ALIAS jwt)
